@@ -61,12 +61,26 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
     }
 });
 
-router.delete('/:id', validateUserId, (req, res) => {
-
+router.delete('/:id', validateUserId, async (req, res) => {
+    const { id } = req.params;
+    const user = await userDb.getById(id);
+    try {
+        const deleted = await userDb.remove(id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
 });
 
-router.put('/:id', validateUserId, (req, res) => {
-
+router.put('/:id', validateUserId, async (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+    try {
+        const updated = await userDb.update(id, changes);
+        res.status(200).json(updated);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
 });
 
 //custom middleware
