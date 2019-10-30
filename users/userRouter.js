@@ -15,16 +15,16 @@ router.post('/', validateUser, async (req, res) => {
     }
 });
 
-router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
-    const body = req.body;
-    try {
-        const post = await db.insert(body);
-        res.status(201).json(post);
-    }
-    catch (error) {
-        res.status(500).json({ message: "Internal server error", error });
-    }
-});
+// router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
+//     const body = req.body;
+//     try {
+//         const post = await db.insert(body);
+//         res.status(201).json(post);
+//     }
+//     catch (error) {
+//         res.status(500).json({ message: "Internal server error", error });
+//     }
+// });
 
 router.get('/', async (req, res) => {
     try {
@@ -45,8 +45,14 @@ router.get('/:id', validateUserId, async (req, res) => {
     }
 });
 
-router.get('/:id/posts', validateUserId, (req, res) => {
-
+router.get('/:id/posts', validateUserId, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await db.getById(id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
 });
 
 router.delete('/:id', validateUserId, (req, res) => {
@@ -86,7 +92,7 @@ function validateUser(req, res, next) {
 };
 
 function validatePost(req, res, next) {
-    const body = req.body;
+    const { body } = req;
     if (!body) {
         res.status(400).json({ message: "missing post data" });
     }
