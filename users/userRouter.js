@@ -4,12 +4,26 @@ const router = require("express").Router();
 
 const db = require("./userDb");
 
-router.post('/', (req, res) => {
-
+router.post('/', validateUser, async (req, res) => {
+    const body = req.body;
+    try {
+        const user = await db.insert(body);
+        res.status(201).json({ user });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
 });
 
-router.post('/:id/posts', (req, res) => {
-
+router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
+    const body = req.body;
+    try {
+        const post = await db.insert(body);
+        res.status(201).json(post);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
 });
 
 router.get('/', async (req, res) => {
@@ -31,15 +45,15 @@ router.get('/:id', validateUserId, async (req, res) => {
     }
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
 
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
 
 });
 
@@ -60,7 +74,8 @@ async function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
-    const body = req.body;
+    const { body } = req;
+    console.log("\n\nvalidateUser, request body: ", body);
     if (!body) {
         res.status(400).json({ message: "missing user data" });
     }
